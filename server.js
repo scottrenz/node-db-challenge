@@ -9,10 +9,19 @@ server.use(helmet());
 server.use(express.json());
 
 server.get('/api/projects', (req, res) => {
-  // get all species from the database
   db('projects')
-  .then(recipes => {
-    res.status(200).json(recipes);
+  .then(projects => {
+    res.status(200).json(projects);
+  })
+  .catch(error => {
+    res.status(500).json(error);
+  });
+});
+
+server.get('/api/resources', (req, res) => {
+  db('resources')
+  .then(projects => {
+    res.status(200).json(projects);
   })
   .catch(error => {
     res.status(500).json(error);
@@ -64,7 +73,7 @@ server.get('/api/projects/tasks/resources/:id', (req, res) => {
 }
     if(ptr.length === 0)
   {
-    res.status(500).json('id not found');
+    res.status(500).json('no tasks and resources for a project with this ID');
 
   }
   else
@@ -88,8 +97,8 @@ server.get('/api/projects/tasks/resources/:id', (req, res) => {
 
 server.get('/api/projects/tasks', (req, res) => {
   db('project_tasks')
-  .then(instructions => {
-    res.status(200).json(instructions);
+  .then(results => {
+    res.status(200).json(results);
   })
   .catch(error => {
     res.status(500).json(error);
@@ -97,8 +106,8 @@ server.get('/api/projects/tasks', (req, res) => {
 });
 server.get('/api/projects/resources', (req, res) => {
   db('projectresources')
-  .then(instructions => {
-    res.status(200).json(instructions);
+  .then(results => {
+    res.status(200).json(results);
   })
   .catch(error => {
     res.status(500).json(error);
@@ -108,9 +117,9 @@ server.get('/api/projects/resources', (req, res) => {
 server.get('/api/projects/:id/tasks', (req, res) => {
   db('project_tasks')
   .where({ project_id: req.params.id })
-  .then(instructions => {
-    if(instructions.length > 0)
-    res.status(200).json(instructions);
+  .then(results => {
+    if(results.length > 0)
+    res.status(200).json(results);
     else
     res.status(500).json('invalid project ID');
   })
@@ -124,9 +133,9 @@ server.put('/api/projects/:id', (req, res) => {
   db('projects')
   .update(req.body)
   .where({ id: req.params.id })
-  .then(instructions => {
-    console.log('instru',instructions,instructions.length)
-    if(instructions)
+  .then(results => {
+    console.log('instru',results,results.length)
+    if(results)
     res.status(200).json(req.body);
     else
     res.status(500).json('invalid project ID');
@@ -139,9 +148,9 @@ server.put('/api/projects/:id', (req, res) => {
 server.get('/api/projects/:id/resources', (req, res) => {
   db('projectresources')
   .where({ project_p_id: req.params.id })
-  .then(instructions => {
-    if(instructions.length > 0)
-    res.status(200).json(instructions);
+  .then(results => {
+    if(results.length > 0)
+    res.status(200).json(results);
     else
     res.status(500).json('invalid project ID');
   })
@@ -150,7 +159,6 @@ server.get('/api/projects/:id/resources', (req, res) => {
   });
 });
 
-// create animal
 server.post('/api/projects', (req, res) => {
   db('projects').insert(req.body)
   .then(ids => {
@@ -159,8 +167,8 @@ server.post('/api/projects', (req, res) => {
     db('projects')
       .where({ id })
       .first()
-    .then(recipe => {
-      res.status(201).json(recipe);
+    .then(project => {
+      res.status(201).json(project);
     });
   })
   .catch(error => {
@@ -168,7 +176,6 @@ server.post('/api/projects', (req, res) => {
   });
 });
 
-// remove species
 server.delete('/api/project/:id', (req, res) => {
   db('projects')
     .where({ id: req.params.id })
