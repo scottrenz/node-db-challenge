@@ -85,8 +85,8 @@ server.get('/api/projects/tasks/resources/:id', (req, res) => {
   });
 });
 
-server.get('/api/shoppinglist', (req, res) => {
-  db('shoppinglist')
+server.get('/api/projects/tasks', (req, res) => {
+  db('project_tasks')
   .then(instructions => {
     res.status(200).json(instructions);
   })
@@ -94,14 +94,37 @@ server.get('/api/shoppinglist', (req, res) => {
     res.status(500).json(error);
   });
 });
-server.get('/api/ingredients/:id/recipes', (req, res) => {
-  db('shoppinglist')
-  .where({ ingredient_id: req.params.id })
+server.get('/api/projects/resources', (req, res) => {
+  db('projectresources')
+  .then(instructions => {
+    res.status(200).json(instructions);
+  })
+  .catch(error => {
+    res.status(500).json(error);
+  });
+});
+
+server.get('/api/projects/:id/tasks', (req, res) => {
+  db('project_tasks')
+  .where({ project_id: req.params.id })
   .then(instructions => {
     if(instructions.length > 0)
     res.status(200).json(instructions);
     else
-    res.status(500).json('invalid ingredient ID');
+    res.status(500).json('invalid project ID');
+  })
+  .catch(error => {
+    res.status(500).json(error);
+  });
+});
+server.get('/api/projects/:id/resources', (req, res) => {
+  db('projectresources')
+  .where({ project_p_id: req.params.id })
+  .then(instructions => {
+    if(instructions.length > 0)
+    res.status(200).json(instructions);
+    else
+    res.status(500).json('invalid project ID');
   })
   .catch(error => {
     res.status(500).json(error);
