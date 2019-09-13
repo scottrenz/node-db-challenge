@@ -19,6 +19,7 @@ server.get('/api/projects', (req, res) => {
   });
 });
 
+
 server.get('/api/projects/tasks/resources/:id', (req, res) => {
   db('projecttaskresources')
   .where({ project_id: req.params.id })
@@ -117,6 +118,24 @@ server.get('/api/projects/:id/tasks', (req, res) => {
     res.status(500).json(error);
   });
 });
+
+server.put('/api/projects/:id', (req, res) => {
+  console.log('projects body',req.body)
+  db('projects')
+  .update(req.body)
+  .where({ id: req.params.id })
+  .then(instructions => {
+    console.log('instru',instructions,instructions.length)
+    if(instructions)
+    res.status(200).json(req.body);
+    else
+    res.status(500).json('invalid project ID');
+  })
+  .catch(error => {
+    res.status(500).json(error);
+  });
+});
+
 server.get('/api/projects/:id/resources', (req, res) => {
   db('projectresources')
   .where({ project_p_id: req.params.id })
@@ -132,12 +151,12 @@ server.get('/api/projects/:id/resources', (req, res) => {
 });
 
 // create animal
-server.post('/api/recipes', (req, res) => {
-  db('recipes').insert(req.body)
+server.post('/api/projects', (req, res) => {
+  db('projects').insert(req.body)
   .then(ids => {
     const id = ids[0];
 
-    db('recipes')
+    db('projects')
       .where({ id })
       .first()
     .then(recipe => {
@@ -150,15 +169,15 @@ server.post('/api/recipes', (req, res) => {
 });
 
 // remove species
-server.delete('/api/recipe/:id', (req, res) => {
-  db('recipes')
+server.delete('/api/project/:id', (req, res) => {
+  db('projects')
     .where({ id: req.params.id })
     .del()
   .then(count => {
     console.log('count',count)
     if (count > 0) {
       console.log('got here')
-      res.status(200).json({ message: `deleted ${count} recipe${count >1 ? 's' : ''} with ID ${req.params.id}` });
+      res.status(200).json({ message: `deleted ${count} project${count >1 ? 's' : ''} with ID ${req.params.id}` });
     } else {
       res.status(404).json({ message: 'Record not found' });
     }
