@@ -8,9 +8,9 @@ const server = express();
 server.use(helmet());
 server.use(express.json());
 
-server.get('/api/recipes', (req, res) => {
+server.get('/api/projects', (req, res) => {
   // get all species from the database
-  db('recipes')
+  db('projects')
   .then(recipes => {
     res.status(200).json(recipes);
   })
