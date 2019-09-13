@@ -19,10 +19,66 @@ server.get('/api/projects', (req, res) => {
   });
 });
 
-server.get('/api/instructions', (req, res) => {
-  db('recipe_instructions')
-  .then(instructions => {
-    res.status(200).json(instructions);
+server.get('/api/projects/tasks/resources/:id', (req, res) => {
+  db('projecttaskresources')
+  .where({ project_id: req.params.id })
+  .then(ptr => {
+
+    const task = []
+    const resource = []
+
+    function gettask (item,ix,arr) {
+      let ok = true
+      for (let i=0;  i < ix; i++ )
+{      if(ptr[ix].task_id === ptr[i].task_id )
+        ok = false
+}
+      if(ok)
+      {
+      task.push(
+       {
+         id : ptr[ix]["task_id"],
+         description: ptr[ix]["task_description"],
+         note: ptr[ix].task_note,
+         completed: ptr[ix]["task_completed"] ? true : false
+        }
+      ) 
+      }
+      ok = true
+      for (let i=0;  i < ix; i++ )
+{      if(ptr[ix].resource_p_id === ptr[i].resource_p_id )
+        ok = false
+}
+      if(ok)
+      {
+      resource.push(
+       {
+         id : ptr[ix]["resource_p_id"],
+         name: ptr[ix]["resource_p_name"],
+         description: ptr[ix]["resource_p_description"],
+        }
+      ) 
+      }
+            
+}
+    if(ptr.length === 0)
+  {
+    res.status(500).json('id not found');
+
+  }
+  else
+  {
+    const results =
+    { id: ptr[0].project_id,
+      name: ptr[0].project_name,
+      completed: ptr[0].project_completed ? true : false,
+    tasks: task,
+    resources: resource
+    }
+    ptr.map(gettask)
+
+    res.status(200).json(results);
+}  
   })
   .catch(error => {
     res.status(500).json(error);
