@@ -146,11 +146,9 @@ server.get('/api/projects/:id/tasks', (req, res) => {
 });
 
 server.put('/api/projects/:id', (req, res) => {
-console.log('put',req.body)
   let name = req.body.name
   let description = req.body.description
   let completed = req.body.completed
-console.log('the 3',name,description,completed)
   let s = ''
   if(typeof(name) === 'string')
 {
@@ -164,9 +162,6 @@ console.log('the 3',name,description,completed)
   }
   if(typeof(completed) === 'boolean')
   s = `${s} ${(typeof(name) === 'string' || typeof(description) === 'string') ? ',' : ''} completed = ${completed ? 1 : 0}`
-console.log(
-  `update projects set ${s} where id = ${req.params.id} and
-  '${name}' not in (select name from projects where id <> ${req.params.id})`)
 
   db.raw(`update projects set ${s} where id = ${req.params.id} and
   '${name}' not in (select name from projects where id <> ${req.params.id})`)
@@ -205,17 +200,13 @@ server.get('/api/projects/:id/resources', (req, res) => {
 server.post('/api/projects', (req, res) => {
 db('projects').where({name: req.body.name})
 .then(name => {
-  console.log('name.name body',name,req.body)
   if(name[0].name === req.body.name)
   {
-    console.log('name.name',req.body)
     req.body.name = null
-    console.log('null.name',req.body)
   }
 })
   db('projects').insert(req.body)
   .then(ids => {
-    console.log('ids',ids,req.body)
     const id = ids[0];
     db('projects')
       .where({ id })
@@ -237,9 +228,7 @@ server.delete('/api/project/:id', (req, res) => {
     .where({ id: req.params.id })
     .del()
   .then(count => {
-    console.log('count',count)
     if (count > 0) {
-      console.log('got here')
       res.status(200).json({ message: `deleted ${count} project${count >1 ? 's' : ''} with ID ${req.params.id}` });
     } else {
       res.status(404).json({ message: 'Record not found' });
