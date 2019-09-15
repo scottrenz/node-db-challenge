@@ -170,8 +170,12 @@ server.put('/api/projects/:id', (req, res) => {
     .then(results => {
       if(results)
       {
-      results[0].completed = results[0].completed ? true : false  
-      res.status(200).json(results);
+        results[0].completed = results[0].completed ? true : false  
+        if( name && name !== results[0].name)
+        {console.log('names',name,results[0].name)
+        res.status(422).json(results);}
+        else
+          res.status(200).json(results);
       }
       else
       res.status(500).json('invalid update paramater');
@@ -179,7 +183,7 @@ server.put('/api/projects/:id', (req, res) => {
     })
   })
   .catch(error => {
-    res.status(500).json(error);
+    res.status(500).json( s === '' ? 'Must supply valid projects columns' :  error);
   });
 });
 
@@ -208,18 +212,20 @@ db('projects').where({name: req.body.name})
   db('projects').insert(req.body)
   .then(ids => {
     const id = ids[0];
+//    console.log('ids post names',ids,req.body.name)
     db('projects')
       .where({ id })
       .first()
     .then(project => {
    project.completed = project.completed ? true : false
-      res.status(201).json(project);
+  // console.log('post names',req.body.name,project[0].name)
+   res.status(201).json(project);
     })
   
   })
 
   .catch(error => {
-    res.status(500).json(error);
+    res.status(req.body.name === null ? 422 : 500).json( req.body.name === null ? 'name must be a valid unique name' : error+ '');
   });
 });
 
