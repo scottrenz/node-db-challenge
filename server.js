@@ -172,8 +172,7 @@ server.put('/api/projects/:id', (req, res) => {
       {
         results[0].completed = results[0].completed ? true : false  
         if( name && name !== results[0].name)
-        {console.log('names',name,results[0].name)
-        res.status(422).json(results);}
+        res.status(422).json(results);
         else
           res.status(200).json(results);
       }
@@ -212,13 +211,11 @@ db('projects').where({name: req.body.name})
   db('projects').insert(req.body)
   .then(ids => {
     const id = ids[0];
-//    console.log('ids post names',ids,req.body.name)
     db('projects')
       .where({ id })
       .first()
     .then(project => {
    project.completed = project.completed ? true : false
-  // console.log('post names',req.body.name,project[0].name)
    res.status(201).json(project);
     })
   
